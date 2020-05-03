@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oa.desktop.news.dao.INewsLabelDao">
+
+    <select id="selectAllCount" resultType="int">
+        select count(*) from newlabel
+        <if test="id > 0">
+            where pid = #{id} or id = #{id}
+        </if>
+    </select>
+
+    <select id="selectNewsLabelByChild" resultMap="newsLabelMap">
+        select id,label_name,label_content,pid from newlabel where id = #{pid}
+    </select>
+    <resultMap id="newsLabelMap" type="NewsLabel">
+        <id column="id" property="id"/>
+        <result column="label_name" property="name"/>
+        <result column="label_content" property="content"/>
+        <association property="parent"
+                     javaType="NewsLabel"
+                     select="selectNewsLabelByChild"
+                     column="pid"/>
+    </resultMap>
+    <select id="selectNewsLabel" resultMap="newsLabelMap">
+        select id,label_name,label_content,pid from newlabel
+         <if test="id > 0">
+             where pid = #{id} or id = #{id}
+         </if>
+         limit #{pageStartIndex},#{pageSize}
+    </select>
+
+    <select id="selectAllNewsLabel" resultMap="newsLabelMap">
+        select id,label_name,label_content,pid from newlabel
+    </select>
+
+    <insert id="insertNewsLabel">
+        insert into newlabel (label_name,label_content,pid) values (#{name},#{content},#{parent.id})
+    </insert>
+
+    <delete id="deleteNewsLabelById">
+        delete from newlabel where id = #{id}
+    </delete>
+
+    <select id="selectNewsLabelById" resultMap="newsLabelMap">
+        select id,label_name,label_content,pid from newlabel where id = #{id}
+    </select>
+
+    <update id="updateNewsLabel">
+        update newlabel set label_name=#{name},label_content=#{content},pid=#{parent.id} where id = #{id}
+    </update>
+
+</mapper>
